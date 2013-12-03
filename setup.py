@@ -3,12 +3,12 @@ from setuptools import setup
 setup(
     name="Dispatching",
     version="0.1.0",
-    packages=['gridly']
+    packages=['gridly'],
     test_suite='test',
     platforms='any',
     install_requires=[
         'enum34'
-    ]
+    ],
 
     author="Nathan West",
     description="A Python library for managing fixed-size 2D spaces",
