@@ -21,16 +21,16 @@ class GridMixin:
         Return location if a location is valid. Raise IndexError otherwise.
         '''
         #TODO: Check back here as a candidate for "inner loop" optimiztion
-        if self.valid(location)
+        if self.valid(location):
             return location
         else:
             raise IndexError(location)
 
     def __getitem__(self, location):
-        return self.unsafe_set(self.check_location(location))
+        return self.unsafe_get(self.check_location(location))
 
     def __setitem__(self, location, value):
-        return self.unsafe_set(self.check_location(location))
+        return self.unsafe_set(self.check_location(location), value)
 
     def row(self, row):
         '''
@@ -66,12 +66,15 @@ class DenseGrid(GridMixin):
     '''
     DenseGrid is for grids which have content in most of the cells.
     '''
-    def __init__(num_rows, num_columns, fill=None, content=None):
+    def __init__(self, num_rows, num_columns, fill=None, content=None):
         if content is None:
             content = [fill] * num_rows * num_columns
         GridMixin.__init__(self, num_rows, num_columns, content)
 
     def index(self, location):
+        '''
+        Convert a (row, column) tuple to an index. Performs no bounds checking.
+        '''
         return (self.num_columns * location[0]) + location[1]
 
     def unsafe_get(self, location):
@@ -86,7 +89,7 @@ class SparseGrid(GridMixin):
     SparseGrid is for grids for which most of the cells are some empty, default
     value
     '''
-    def __init__(num_rows, num_columns, fill=None, content=None):
+    def __init__(self, num_rows, num_columns, fill=None, content=None):
         if content is None:
             content = {}
         GridMixin.__init__(self, num_rows, num_columns, content)
