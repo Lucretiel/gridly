@@ -6,7 +6,7 @@ class TestLocation(unittest.TestCase):
 		self.location65 = Location(6, 5)
 
 	def test_zero(self):
-		self.assertEqual(Location.zero()), Location(0, 0))
+		self.assertEqual(Location.zero(), Location(0, 0))
 
 	def test_add(self):
 		self.assertEqual(self.location23 + self.location65, Location(8, 8))
