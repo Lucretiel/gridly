@@ -1,3 +1,5 @@
+import copy
+
 class GridMixin:
     def __init__(self, num_rows, num_columns, content):
         self.num_rows = num_rows
@@ -36,6 +38,8 @@ class GridMixin:
         for column in range(self.num_columns):
             yield self.column(column)
 
+    def copy(self):
+        return type(self)(self.num_rows, self.num_columns, content=copy.copy(self.content))
 
 class DenseGrid(GridMixin):
     def __init__(num_rows, num_columns, fill=None, content=None):
