@@ -64,6 +64,11 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         '''
         return Location._directions[direction](self, distance)
 
+    def path(self, *directions):
+        for d in directions:
+            self = self.relative(d)
+        return self
+
     def adjacent(self):
         '''
         Return a set of the 4 locations adjacent to self.
@@ -82,4 +87,4 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         '''
         Return a set of the 8 locations surrounding self
         '''
-        return self.adjacent() + self.diagonals()
+        return self.adjacent() | self.diagonals()
