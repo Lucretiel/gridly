@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name="Dispatching",
+    name="gridly",
     version="0.1.0",
     packages=['gridly'],
     test_suite='test',
@@ -13,7 +13,7 @@ setup(
     author="Nathan West",
     description="A Python library for managing fixed-size 2D spaces",
     license="LGPLv3",
-    url="https://github.com/Lucretiel/Dispatch",
+    url="https://github.com/Lucretiel/gridly",
 
     classifiers=[
         'Development Status :: 3 - Alpha',
