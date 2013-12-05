@@ -96,10 +96,9 @@ class SparseGrid(GridMixin):
         self.fill = fill
 
     def unsafe_get(self, location):
-        return self.content.get(tuple(location), self.fill)
+        return self.content.get(location, self.fill)
 
     def unsafe_set(self, location, value):
-        location = tuple(location)
         if value is self.fill:
             self.content.pop(location, None)
         else:
