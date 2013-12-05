@@ -1,15 +1,22 @@
 language: python
 python:
-  - "3.3"
-  - "2.7"
-  - "3.2"
-# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+  - '3.3'
+  - '2.7'
+  - '3.2'
+
 install:
   - pip install -r requirements.txt --use-mirrors
   - pip install coveralls
-# command to run tests, e.g. python setup.py test
 script:
   - nosetests --with-coverage --cover-package=gridly -v test
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: Lucretiel
+  password:
+    secure: ItMHM+YUcQm3JRQwCpaiSiPSTpwRy33oUQy877x7SJg6Cmd8ImnYbHGn4nBTQd4/Zp3qizmTK8ohE1r+lhvEySO9s8DSit4ArI0/TQbsPfVTUQzzka5ONnZSWwYu8hprUp+fc9MjeydLFioYFg825LX5qL1QCMbk1J2U8G5ohP8=
+  on:
+    tags: true
