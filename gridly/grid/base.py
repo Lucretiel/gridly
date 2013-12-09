@@ -1,4 +1,4 @@
-def check_range(valye, max):
+def check_range(value, max):
     '''
     return true if value between 0 and max (max is exclusive)
     '''
