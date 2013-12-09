@@ -35,6 +35,11 @@ class GenericGridTests:
             for column in range(self.num_columns):
                 self.assertIs(self.grid[row, column], None)
 
+    def test_empty(self):
+        for row in range(self.num_rows):
+            for column in range(self.num_columns):
+                self.assertTrue(self.grid.empty((row, column)))
+
     def test_random_sets(self):
         locations = {
             (1, 1),

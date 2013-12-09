@@ -24,7 +24,7 @@ class DenseGrid(GridMixin):
 
     def unsafe_row(self, row):
         '''
-        Specialized implementation of the row iterator
+        Specialized implementation of the row iterator, based on list slicing
         '''
         start = self.index((row, 0))
         return self.content[start:(start+self.num_columns)]
