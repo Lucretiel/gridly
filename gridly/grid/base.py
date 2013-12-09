@@ -1,3 +1,5 @@
+import abc
+
 def valid_range(value, max):
     '''
     return true if value between 0 and max (max is exclusive)
@@ -6,29 +8,37 @@ def valid_range(value, max):
 
 def check_or_raise(value, condition, Exception):
     '''
-    Returns the value if it meets the condition, otherwise raises and Exception
+    Returns the value if it meets the condition, otherwise raises and
+    Exception
     '''
     if condition(value):
         return value
     else:
         raise Exception(value)
 
-class GridMixin:
+class GridBase(metaclass=abc.ABCMeta)
     '''
-    Mixin to provide common functionality to Grids. Grid concrete classes should
-    implement `unsafe_get`, `unsafe_set`, and `__init__(num_rows, num_columns,
-    content=content)`
+    Base class to provide common functionality to Grids. Grid concrete
+    classes should implement `unsafe_get` and `unsafe_set`.
     '''
 
-    def __init__(self, num_rows, num_columns, fill, content):
+    def __init__(self, num_rows, num_columns, content):
         self.num_rows = num_rows
         self.num_columns = num_columns
         self.content = content
-        self.fill = fill
+
+    @property
+    def dimensions(self):
+        '''
+        Get the dimesions as a tuple
+        '''
+        return self.num_rows, self.sum_columns
 
     ####################################################################
     # Bounds Checkers
     ####################################################################
+
+    #TODO: these are inner-loop functions. Determine if they should be optimized.
     def valid_row(self, row):
         '''return true if the row is in the bounds of this grid.'''
         return valid_range(row, self.num_rows)
@@ -59,13 +69,20 @@ class GridMixin:
         '''
         Return the location if it is valid. Raise IndexError otherwise.
         '''
-        #TODO: Check back here as a candidate for "inner loop" optimiztion
         return check_or_raise(location, self.valid, IndexError)
 
 
     ####################################################################
     # Basic element access
     ####################################################################
+    @abc.abstractmethod
+    def unsafe_get(self, location):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def unsafe_set(self, location, value):
+        raise NotImplementedError
+
     def get(self, location):
         '''
         Perform a checked lookup. Raises IndexError if location is out of range.
@@ -89,12 +106,6 @@ class GridMixin:
         Perform a checked set. Raises IndexError if location is out of range.
         '''
         self.set(location, value)
-
-    def empty(self, location):
-        '''
-        Returns true if the value at the location is the fill value
-        '''
-        return self.get(location) is self.fill
 
 
     ####################################################################

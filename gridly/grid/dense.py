@@ -1,6 +1,6 @@
-from gridly.grid.base import GridMixin
+from gridly.grid.base import GridBase
 
-class DenseGrid(GridMixin):
+class DenseGrid(GridBase):
     '''
     DenseGrid is for grids which have content in most of the cells. It is
     implemented as a list.
@@ -8,7 +8,7 @@ class DenseGrid(GridMixin):
     def __init__(self, num_rows, num_columns, fill=None, content=None):
         if content is None:
             content = [fill] * num_rows * num_columns
-        GridMixin.__init__(self, num_rows, num_columns, fill, content)
+        GridMixin.__init__(self, num_rows, num_columns, content)
 
     def index(self, location):
         '''
