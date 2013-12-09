@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="gridly",
-    version="0.2.0",
+    version="0.3.0",
     packages=['gridly'],
     test_suite='test',
     platforms='any',
