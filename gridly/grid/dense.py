@@ -1,4 +1,4 @@
-from .base import GridMixin
+from gridly.grid.base import GridMixin
 
 class DenseGrid(GridMixin):
     '''
