@@ -10,6 +10,7 @@ install:
 
 script:
   - coverage run --source=gridly -m nose -v
+  - coverage report -m
 
 after_success:
   - coveralls
