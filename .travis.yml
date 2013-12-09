@@ -1,14 +1,15 @@
 language: python
 python:
   - '3.3'
-  - '2.7'
   - '3.2'
+  - '2.7'
 
 install:
   - pip install -r requirements.txt --use-mirrors
-  - pip install coveralls wheel
+  - pip install coveralls coverage wheel --use-mirrors
+
 script:
-  - nosetests --with-coverage --cover-package=gridly -v test
+  - coverage run --source=gridly -m nose -v
 
 after_success:
   - coveralls
