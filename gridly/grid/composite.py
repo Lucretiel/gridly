@@ -14,7 +14,7 @@ class CompositeGrid(GridBase):
             return self.grid.content[index].unsafe_get(location)
 
         def __setitem__(self, index, value):
-            self.grid.content[index].unsafe_set(location)
+            self.grid.content[index].unsafe_set(location, value)
 
         def __len__(self):
             return len(self.grid.content)
