@@ -8,7 +8,7 @@ class DenseGrid(GridMixin):
     def __init__(self, num_rows, num_columns, fill=None, content=None):
         if content is None:
             content = [fill] * num_rows * num_columns
-        GridMixin.__init__(self, num_rows, num_columns, content)
+        GridMixin.__init__(self, num_rows, num_columns, fill, content)
 
     def index(self, location):
         '''

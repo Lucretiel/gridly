@@ -10,10 +10,11 @@ class GridMixin:
     implement `unsafe_get`, `unsafe_set`, and `__init__(num_rows, num_columns,
     content=content)`
     '''
-    def __init__(self, num_rows, num_columns, content):
+    def __init__(self, num_rows, num_columns, fill, content):
         self.num_rows = num_rows
         self.num_columns = num_columns
         self.content = content
+        self.fill = fill
 
     def valid_row(self, row):
         return check_range(row, self.num_rows)
