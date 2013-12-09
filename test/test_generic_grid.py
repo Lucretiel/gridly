@@ -1,7 +1,7 @@
 from unittest import TestCase
-from gridly.grid import DenseGrid, SparseGrid
+from gridly import DenseGrid, SparseGrid
 
-class GenericGridTests:
+class TestGenericGrid:
     @classmethod
     def setUpClass(cls):
         cls.num_rows = 5
@@ -34,11 +34,6 @@ class GenericGridTests:
         for row in range(self.num_rows):
             for column in range(self.num_columns):
                 self.assertIs(self.grid[row, column], None)
-
-    def test_empty(self):
-        for row in range(self.num_rows):
-            for column in range(self.num_columns):
-                self.assertTrue(self.grid.empty((row, column)))
 
     def test_random_sets(self):
         locations = {
@@ -102,8 +97,8 @@ class GenericGridTests:
                 else:
                     self.assertEqual(cell, 10)
 
-class TestDenseGrid(GenericGridTests, TestCase):
+class TestDenseGrid(TestGenericGrid, TestCase):
     grid_type = DenseGrid
 
-class TestSparseGrid(GenericGridTests, TestCase):
+class TestSparseGrid(TestGenericGrid, TestCase):
     grid_type = SparseGrid
