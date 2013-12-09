@@ -7,11 +7,6 @@ class TestGenericGrid:
         cls.num_rows = 5
         cls.num_columns = 7
 
-    def setUp(self):
-        self.grid = self.grid_type(
-            self.num_rows,
-            self.num_columns)
-
     def test_dimensions(self):
         self.assertEqual(self.grid.num_rows, self.num_rows)
         self.assertEqual(self.grid.num_columns, self.num_columns)
@@ -29,6 +24,12 @@ class TestGenericGrid:
     def test_column_iter_out_of_range(self):
         with(self.assertRaises(IndexError)):
             column = list(self.grid.column(self.num_columns-10))
+
+class TestGenericConcreteGrid(TestGenericGrid):
+    def setUp(self):
+        self.grid = self.grid_type(
+            self.num_rows,
+            self.num_columns)
 
     def test_empty_reads(self):
         for row in range(self.num_rows):
@@ -97,8 +98,14 @@ class TestGenericGrid:
                 else:
                     self.assertEqual(cell, 10)
 
-class TestDenseGrid(TestGenericGrid, TestCase):
+class TestDenseGrid(TestGenericConcreteGrid, TestCase):
     grid_type = DenseGrid
 
-class TestSparseGrid(TestGenericGrid, TestCase):
+class TestSparseGrid(TestGenericConcreteGrid, TestCase):
     grid_type = SparseGrid
+
+class TestCompositeGrid(TestGenericGrid, TestCase):
+    def setUp(self):
+        self.grid1 = DenseGrid(self.num_rows, self.num_columns)
+        self.grid2 = SparseGrid(self.num_rows, self.num_columns)
+        self.comp = CompositeGrid(self.grid1, self.grid2)
