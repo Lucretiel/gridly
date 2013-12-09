@@ -21,3 +21,12 @@ class DenseGrid(GridMixin):
 
     def unsafe_set(self, location, value):
         self.content[self.index(location)] = value
+
+    def row(self, row):
+        '''
+        Specialized implementation of the row iterator
+        '''
+        if not self.valid_row(row):
+            raise IndexError(row)
+        start = self.index((row, 0))
+        return self.content[start:(start+self.num_columns)]

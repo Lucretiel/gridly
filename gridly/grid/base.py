@@ -1,3 +1,9 @@
+def check_range(valye, max):
+    '''
+    return true if value between 0 and max (max is exclusive)
+    '''
+    return (0 <= value < max)
+
 class GridMixin:
     '''
     Mixin to provide common functionality to Grids. Grid concrete classes should
@@ -9,12 +15,17 @@ class GridMixin:
         self.num_columns = num_columns
         self.content = content
 
+    def valid_row(self, row):
+        return check_range(row, self.num_rows)
+
+    def valid_column(self, column):
+        return check_range(column, self.num_columns)
+
     def valid(self, location):
         '''
         Return true if a location is valid
         '''
-        return (0 <= location[0] < self.num_rows and
-            0 <= location[1] < self.num_columns)
+        return self.valid_row(location[0]) and self.valid_column(location[1])
 
     def check_location(self, location):
         '''
