@@ -1,5 +1,5 @@
 from unittest import TestCase
-from gridly import DenseGrid, SparseGrid
+from gridly import DenseGrid, SparseGrid, CompositeGrid
 
 class TestGenericGrid:
     @classmethod
@@ -108,4 +108,4 @@ class TestCompositeGrid(TestGenericGrid, TestCase):
     def setUp(self):
         self.grid1 = DenseGrid(self.num_rows, self.num_columns)
         self.grid2 = SparseGrid(self.num_rows, self.num_columns)
-        self.comp = CompositeGrid(self.grid1, self.grid2)
+        self.grid = CompositeGrid(self.grid1, self.grid2)
