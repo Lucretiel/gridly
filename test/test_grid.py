@@ -22,6 +22,14 @@ class GenericGridTests:
                 with self.assertRaises(IndexError):
                     value = self.grid[row, column]
 
+    def test_row_iter_out_of_range(self):
+        with self.assertRaises(IndexError):
+            row = list(self.grid.row(self.num_rows+10))
+
+    def test_column_iter_out_of_range(self):
+        with(self.assertRaises(IndexError)):
+            column = list(self.grid.column(self.num_columns-10))
+
     def test_empty_reads(self):
         for row in range(self.num_rows):
             for column in range(self.num_columns):
