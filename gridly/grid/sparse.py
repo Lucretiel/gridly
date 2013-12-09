@@ -8,7 +8,7 @@ class SparseGrid(GridBase):
     def __init__(self, num_rows, num_columns, fill=None, content=None):
         if content is None:
             content = {}
-        GridMixin.__init__(self, num_rows, num_columns, content)
+        GridBase.__init__(self, num_rows, num_columns, content)
         self.fill = fill
 
     def unsafe_get(self, location):

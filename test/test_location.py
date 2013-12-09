@@ -1,6 +1,6 @@
 import unittest
-from gridly.location import Location as Loc
-from gridly.direction import Direction as Dir
+from gridly import Location as Loc
+from gridly import Direction as Dir
 
 class TestLocation(unittest.TestCase):
     def test_zero(self):

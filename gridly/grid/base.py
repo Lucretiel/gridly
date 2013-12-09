@@ -16,7 +16,7 @@ def check_or_raise(value, condition, Exception):
     else:
         raise Exception(value)
 
-class GridBase(metaclass=abc.ABCMeta)
+class GridBase(metaclass=abc.ABCMeta):
     '''
     Base class to provide common functionality to Grids. Grid concrete
     classes should implement `unsafe_get` and `unsafe_set`.
@@ -32,7 +32,7 @@ class GridBase(metaclass=abc.ABCMeta)
         '''
         Get the dimesions as a tuple
         '''
-        return self.num_rows, self.sum_columns
+        return self.num_rows, self.num_columns
 
     ####################################################################
     # Bounds Checkers
