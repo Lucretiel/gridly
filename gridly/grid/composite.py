@@ -5,16 +5,17 @@ class CompositeGrid(GridBase):
     # Proxy class for access to individual grids
     ####################################################################
 
-    class CompositeGridCellProxy:
+    class CellProxy:
+        __slots__ = ('grid', 'location')
         def __init__(self, grid, location):
             self.grid = grid
             self.location = location
 
         def __getitem__(self, index):
-            return self.grid.content[index].unsafe_get(location)
+            return self.grid.content[index].unsafe_get(self.location)
 
         def __setitem__(self, index, value):
-            self.grid.content[index].unsafe_set(location, value)
+            self.grid.content[index].unsafe_set(self.location, value)
 
         def __len__(self):
             return len(self.grid.content)
@@ -30,8 +31,8 @@ class CompositeGrid(GridBase):
         GridBase.__init__(self, dimensions[0], dimensions[1], grids)
 
     def unsafe_get(self, location):
-        return CompositeGridCellProxy(self, location)
+        return CompositeGrid.CellProxy(self, location)
 
     def unsafe_set(self, location, value):
-        for grid, sub_value in zip(self.grids, value):
-            grid.unsafe_set(locations, sub_value)
+        for grid, sub_value in zip(self.content, value):
+            grid.unsafe_set(location, sub_value)

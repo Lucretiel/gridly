@@ -109,3 +109,29 @@ class TestCompositeGrid(TestGenericGrid, TestCase):
         self.grid1 = DenseGrid(self.num_rows, self.num_columns)
         self.grid2 = SparseGrid(self.num_rows, self.num_columns)
         self.grid = CompositeGrid(self.grid1, self.grid2)
+
+    def test_get_set(self):
+        self.grid[3, 4] = [1, 2]
+        self.assertEqual(list(self.grid[3, 4]), [1, 2])
+        self.assertEqual(self.grid1[3, 4], 1)
+        self.assertEqual(self.grid2[3, 4], 2)
+
+    def test_iter(self):
+        for row in self.grid.rows():
+            for cell in row:
+                cell[0] = 1
+                cell[1] = 2
+
+        for row in range(self.num_rows):
+            for column in range(self.num_columns):
+                self.assertEqual(list(self.grid[row, column]), [1, 2])
+                self.assertEqual(self.grid1[row, column], 1)
+                self.assertEqual(self.grid2[row, column], 2)
+
+                for layer, i in zip(self.grid[row, column], (1, 2)):
+                    self.assertEqual(layer, i)
+
+    def test_dimension_mismatch(self):
+        self.grid2 = SparseGrid(self.num_rows+1, self.num_columns+1)
+        with self.assertRaises(ValueError):
+            self.grid = CompositeGrid(self.grid1, self.grid2)
