@@ -91,3 +91,6 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         Return a set of the 8 locations surrounding self
         '''
         return self.adjacent() | self.diagonals()
+
+relative_locations = {direction: Location.zero().relative(direction)
+    for direction in Direction}
