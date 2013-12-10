@@ -65,6 +65,9 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         return Location._directions[direction](self, distance)
 
     def path(self, *directions):
+        '''
+        Follow a series of directions to get a final location
+        '''
         for d in directions:
             self = self.relative(d)
         return self
