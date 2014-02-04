@@ -19,104 +19,71 @@ following:
     wall: This entity is colliding with the edge of the grid
     solid: This entity is colliding with a non-entity
     entity: This entity is colliding with an entity
-    pending: This entity MAY collide with an entity (There is an entity
-        on this entity's desired location whose final movement is
-        indeterminant.)
+    miss: This entity is moving on to a previously occupied space
+    pending: This entity may collide with an entity
 
-Resolve group collisions- for every set of more than one entity trying
-to move on to a given location, decide which on gets to move with the
-resolce_group_collison rule. Note that there is no guarentee that it will
-actually move. Each entity involved in a group collision may choose to
-either stay, die, or move, though only up to one may move.
+Determine resolution order- movement handler functions are called in a
+deterministic order, once for each entity or group of entities. It is
+important that as much automated resolution as possible happens before
+these handling functions are called. A dependency graph is created, in
+which each entity that is attempting to move onto a space with another
+entity depends on it. Handling functions are then called in reverse order-
+entities that depend on other entities have their handlers called after.
+In some cases, multiple entities trying to move on to the same space can
+create a circular dependency; in this case, a handler function decides
+which entity gets to move out of the group, resolving the circle. In cases
+where there are multiple choices for which handler to call next, location
+sort order is used.
 
-Resolve movement chains. During this step, any entities with the pending
-movement state are checked. If there is a cycle of pending movement,
-all involved entites may move.
-
-Handle individual movements. This is where client logic for movement
-and collision is handled. At this point, the client may choose to kill
-entities.
+Call handlers- handlers are called in resolution order. The single entity
+handlers can optionally return a CollisionResolution, which determines what
+happens to the entity:
+    proceed: For non-movng CollisionTypes, don't move the entity. Otherwise,
+    move the entity.
+    die: Kill the entity and remove it from the field.
 
 The system is customized by providing rules:
+    Accessor methods: These control access to the grid
     get_entity(grid, location): get an object from a grid
-    pick_entity(grid, location): remove an object from the grid
+    pick_entity(grid, location): remove and return an object from the grid
     put_entity(grid, location, value): add an object to the grid
-    is_empty(grid, location): return true if the location cannot be moved onto
+    move_entity(grid, location, destination): move an object. If not given,
+    defaults to the equivelent of:
+        put_entity(grid, destination, pick_entity(grid, location))
+    is_empty(grid, location): return true if the location can be moved onto
     empty_object: default object for empty cells.
 
-    resolve_group_collision(grid, entities, target_location, target_entity=None):
-        Core function for collision handling. Called for every group of
-        entities trying to move onto a given location in an arbitrary order.
-        The arguments to this function are the grid, a list of entities,
-        the location they are trying to move on to, and if it exists,
-        the entity currently occupying this location.
-        In addition to performing any client logic, this function should
-        return the location of the entity that gets to move, or None. It
-        may also set the resolution of each Up to one
-        of them may get a move resolution. The entity with a move resolution
-        will only move if there is no target_entity, or if it doesn't
-        move. After being called, the resolution is cleared, and each
-        enitty not chosen to move is given a non_moving CollisionType.
-        If more than one entity is chosen to move, the move is aborted
-        and a RuntimeError is raised. Its default behavior is to prevent
-        any movement (All entities get the stay resolution)
 
-    handle_movement(grid, entity, target_entity=None)
-        This is called once for each entity. It is called after group
-        collisions and movement chains are resolved. Its arguments are the
-        entity being processed and, if it exists, the entity on the location
-        being moved to. This function is called for all entitites, including
-        those with non_moving and none collision types. Its default behavior
-        is to call handle_type_none, hanlde_type_non_moving, or
-        handle_collision.
+    Handlers: These are used to handle collision and movement. They are
+    intended to implement light client logic, or resolve collisons.
 
-    handle_collision(grid, entity, target_entity=None)
-        This is called by resolve_movement for the CollisionTypes that are
-        actually collisions. It otherwise has the same semantics as
-        resolve_movement. Its default behavior is to call
-        resolve_type_{CollisionType}.
+    handle_movement(grid, entity)- called for all single entity movements,
+    even non-collision movements. The entity object has a location,
+    desired_location, and collision state. Its default behavior is to call
+    handle_collision for collisions (wall, entity, and solid), and to call
+    handle_type_{CollisionType} for the other collision types. The function
+    can optionally return a CollisionResolution to indicate what should
+    happen to the entity. Only certain CollisionResolutions apply to each
+    CollisionType
 
-    handle_type_{CollisionType}
-        Called by resolve_movement or resolve_collision to resolve the
-        individual collision. Can contain client
+    handle_collision(grid, entity)- called for all single entity collisions,
+    which are wall, solid, and entity. Like with handle_movement, it can
+    optionally return a CollisionResolution. Its default behavior is to call
+    handle_type_{CollisionType}.
 
-Logic Ordering and Determinsim:
-It is important that movement resolution be deterministic. In an ideal
-world, the client logic is designed such that the end result is the same
-no matter what order it is called in. However, there's no way to guarentee
-that, so rules are in place that describe the order that the resolve_*
-and handle_* rules are called.
+    handle_type_{CollisionType}(grid, entity) called for each individual
+    CollisionType. Can return a CollisionResolution.
 
-The basic rule of thumb is that at each stage, the methods are called in
-sorted order of the desired location. However, in the event of an acyclic
-dependency chain, handlers at the dependency-free end of the chain are
-called before the handlers that depend on them. For instance:
+    default_resolutions- a dict that maps the various CollisionTypes to their
+    default CollisionResolutions
 
-    |>>>|
-
-Say you have the 3 entities above, all moving right. Under the sorted order
-rules, they would be called left-to-right. However, under the dependency
-rules, they will be called right-to-left. The reason is that the rightmost
-entity might choose to stay or die. Depending on its choice, the middle
-entity will have its CollisionType updated from pending to either none
-or entity.
-
-The same rules apply to group collisions. For instance:
-
-    | VV |
-    |>>  |
-    |  ^<|
-    |  ^ |
-
-In this example, there are 3 group collisions. The top right one will
-be resolved first, because of dependency
+    handle_group_collision(grid, destination, entities)- called when a group
+    of entities are all trying to move on to the same space. May return
+    the entity or location of the entity which should move. This function is
+    called in addition to
 
 
 
-Note also that there is no guarentee that, in an acyclic movement dependency
-chain, the various entities in the change will be handled exactly one after
-the other. The only guarentee is that entitites earlier in the dependency
-chain will be handled earlier than those later in the chain.
 '''
 
 import enum
@@ -133,10 +100,8 @@ class CollisionType(enum.Enum):
     wall = 2  # Collision with the edge of the grid
     solid = 3  # Collision with a non-entity
     entity = 4  # Collision with a non-moving entity
-
-    # Internal Use
-    pending = -1  # This entity is colliding with an object whos movement is unknown
-    unknown = -2  # Calculations haven't been made for this entity
+    miss = 5  # Avoided colliding with an entity
+    pending = 6  # Potential collsion with an entity
 
 
 class CollisionResolution(enum.Enum):
@@ -144,7 +109,7 @@ class CollisionResolution(enum.Enum):
     These are the different resolutions an entity can have, for a given
     collision
     '''
-    stay = 1  # Do not move the entity
+    proceed = 1  # Don't kill the entity
     die = 2  # Kill the entity
 
 
