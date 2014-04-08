@@ -143,7 +143,7 @@ class GridBase(metaclass=abc.ABCMeta):
         the row
         '''
         for row in range(self.num_rows):
-            yield self.row(row, )
+            yield self.unsafe_row(row)
 
     def columns(self):
         '''
@@ -151,4 +151,4 @@ class GridBase(metaclass=abc.ABCMeta):
         cell in the column
         '''
         for column in range(self.num_columns):
-            yield self.column(column)
+            yield self.unsafe_column(column)
