@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name="gridly",
     version="0.4.3",
-    packages=['gridly'],
+    packages=['gridly, gridly.grid'],
     test_suite='test',
     platforms='any',
     install_requires=[
