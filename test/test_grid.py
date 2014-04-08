@@ -2,10 +2,8 @@ from unittest import TestCase
 from gridly import DenseGrid, SparseGrid, CompositeGrid
 
 class TestGenericGrid:
-    @classmethod
-    def setUpClass(cls):
-        cls.num_rows = 5
-        cls.num_columns = 7
+    num_rows = 5
+    num_columns = 7
 
     def test_dimensions(self):
         self.assertEqual(self.grid.num_rows, self.num_rows)
