@@ -1,3 +1,3 @@
-from .direction import Direction
-from .location import Location
-from .grid import DenseGrid, SparseGrid, CompositeGrid, Grid
+from gridly.direction import Direction
+from gridly.location import Location
+from gridly.grid import DenseGrid, SparseGrid, CompositeGrid, Grid

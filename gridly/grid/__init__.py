@@ -1,4 +1,4 @@
-from .dense import DenseGrid
-from .sparse import SparseGrid
-from .composite import CompositeGrid
+from gridly.grid.dense import DenseGrid
+from gridly.grid.sparse import SparseGrid
+from gridly.grid.composite import CompositeGrid
 Grid = DenseGrid
