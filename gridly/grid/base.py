@@ -1,20 +1,6 @@
 import abc
+from gridly import Location
 
-def valid_range(value, max):
-    '''
-    return true if value between 0 and max (max is exclusive)
-    '''
-    return (0 <= value < max)
-
-def check_or_raise(value, condition, Exception):
-    '''
-    Returns the value if it meets the condition, otherwise raises and
-    Exception
-    '''
-    if condition(value):
-        return value
-    else:
-        raise Exception(value)
 
 class GridBase(metaclass=abc.ABCMeta):
     '''
@@ -23,15 +9,20 @@ class GridBase(metaclass=abc.ABCMeta):
     '''
 
     def __init__(self, num_rows, num_columns, content):
-        self.num_rows = num_rows
-        self.num_columns = num_columns
+        self._row_range = range(num_rows)
+        self._col_range = range(num_columns)
         self.content = content
 
     @property
+    def num_rows(self):
+        return len(self._row_range)
+
+    @property
+    def num_columns(self):
+        return len(self._col_range)
+
+    @property
     def dimensions(self):
-        '''
-        Get the dimesions as a tuple
-        '''
         return self.num_rows, self.num_columns
 
     ####################################################################
@@ -41,11 +32,11 @@ class GridBase(metaclass=abc.ABCMeta):
     #TODO: these are inner-loop functions. Determine if they should be optimized.
     def valid_row(self, row):
         '''return true if the row is in the bounds of this grid.'''
-        return valid_range(row, self.num_rows)
+        return row in self._row_range
 
     def valid_column(self, column):
         '''return true if the column is in the bounds of this grid.'''
-        return valid_range(column, self.num_columns)
+        return column in self._col_range
 
     def valid(self, location):
         '''
@@ -57,19 +48,28 @@ class GridBase(metaclass=abc.ABCMeta):
         '''
         Return the row if it is in the bounds. Raise IndexError otherwise
         '''
-        return check_or_raise(row, self.valid_row, IndexError)
+        if self.valid_row(row):
+            return row
+        else:
+            raise IndexError(row)
 
     def check_column(self, column):
         '''
         Return the row if it is in the bounds. Raise IndexError otherwise
         '''
-        return check_or_raise(column, self.valid_column, IndexError)
+        if self.valid_column(column):
+            return column
+        else:
+            raise IndexError(column)
 
     def check_location(self, location):
         '''
         Return the location if it is valid. Raise IndexError otherwise.
         '''
-        return check_or_raise(location, self.valid, IndexError)
+        if self.valid(location):
+            return location
+        else:
+            raise IndexError(location)
 
 
     ####################################################################
@@ -83,29 +83,17 @@ class GridBase(metaclass=abc.ABCMeta):
     def unsafe_set(self, location, value):
         raise NotImplementedError
 
-    def get(self, location):
+    def __getitem__(self, location):
         '''
         Perform a checked lookup. Raises IndexError if location is out of range.
         '''
         return self.unsafe_get(self.check_location(location))
 
-    def set(self, location, value):
-        '''
-        Perform a checked set. Raises IndexError if location is out of range.
-        '''
-        self.unsafe_set(self.check_location(location), value)
-
-    def __getitem__(self, location):
-        '''
-        Perform a checked lookup. Raises IndexError if location is out of range.
-        '''
-        return self.get(location)
-
     def __setitem__(self, location, value):
         '''
         Perform a checked set. Raises IndexError if location is out of range.
         '''
-        self.set(location, value)
+        self.unsafe_set(self.check_location(location), value)
 
 
     ####################################################################
@@ -115,14 +103,14 @@ class GridBase(metaclass=abc.ABCMeta):
         '''
         Iterate over all the cells in a row. Performs no range checking.
         '''
-        for column in range(self.num_columns):
+        for column in self._col_range:
             yield self.unsafe_get((row, column))
 
     def unsafe_column(self, column):
         '''
         Iterate over all the cells in a column. Performs no range checking.
         '''
-        for row in range(self.num_rows):
+        for row in self._row_range:
             yield self.unsafe_get((row, column))
 
     def row(self, row):
@@ -142,7 +130,7 @@ class GridBase(metaclass=abc.ABCMeta):
         Iterate over each row. Each row is an iterable, containing each cell in
         the row
         '''
-        for row in range(self.num_rows):
+        for row in self._row_range:
             yield self.unsafe_row(row)
 
     def columns(self):
@@ -150,5 +138,20 @@ class GridBase(metaclass=abc.ABCMeta):
         Iterate over each columns. Each column is an iterable, containing each
         cell in the column
         '''
-        for column in range(self.num_columns):
+        for column in self._col_range:
             yield self.unsafe_column(column)
+
+    def locations(self):
+        '''
+        Iterate over each location on the grid
+        '''
+        for row in self._row_range:
+            for column in self._col_range:
+                yield (row, column)
+
+    def cells(self):
+        '''
+        Iterate over (location, cell) pairs
+        '''
+        for location in self.locations():
+            yield location, self.unsafe_get(location)

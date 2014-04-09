@@ -26,6 +26,12 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         '''
         return Location(self[0] - other[0], self[1] - other[1])
 
+    def __mul__(self, value):
+        '''
+        Multiply a location by a factor
+        '''
+        return Location(self[0] * value, self[1] * value)
+
     def above(self, distance=1):
         '''
         Return the location above this one, at the specified distance
@@ -50,41 +56,23 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         '''
         return Location(self[0], self[1]+distance)
 
-    #directions is a mapping of directions to the relative location functions above
-    _directions = {
-        Direction.up: above,
-        Direction.down: below,
-        Direction.left: left,
-        Direction.right: right
-    }
-
-    def relative(self, direction, distance=1):
+    def relative(self, direction, distance):
         '''
-        Returns the location in the direction specified, at the specified distance
+        Return the location in a relative Direction and distance
         '''
-        return Location._directions[direction](self, distance)
-
-    def path(self, *directions):
-        '''
-        Follow a series of directions to get a final location
-        '''
-        for d in directions:
-            self = self.relative(d)
-        return self
+        return self + (direction.value * distance)
 
     def adjacent(self):
         '''
         Return a set of the 4 locations adjacent to self.
         '''
-        return {self.relative(direction) for direction in Direction}
+        return {self + d for d in ((0, 1), (0, -1), (1, 0), (-1, 0))}
 
     def diagonals(self):
         '''
         Return a set of the 4 locations diagonaly adjacent to self
         '''
-        return {self.relative(dir1).relative(dir2)
-            for dir1 in (Direction.up, Direction.down)
-            for dir2 in (Direction.left, Direction.right)}
+        return {self + d for d in ((1, 1), (-1, 1), (1, -1), (-1, -1))}
 
     def surrounding(self):
         '''

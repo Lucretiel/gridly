@@ -1,3 +1,4 @@
+from itertools import repeat, chain, islice
 from gridly.grid.base import GridBase
 
 class DenseGrid(GridBase):
@@ -5,8 +6,10 @@ class DenseGrid(GridBase):
     DenseGrid is for grids which have content in most of the cells. It is
     implemented as a list.
     '''
-    def __init__(self, num_rows, num_columns, fill=None):
-        content = [fill] * num_rows * num_columns
+    def __init__(self, num_rows, num_columns, content=(), fill=None):
+        content = list(islice(chain(content, repeat(fill)),
+            num_rows * num_columns))
+
         GridBase.__init__(self, num_rows, num_columns, content)
 
     def index(self, location):
@@ -20,10 +23,3 @@ class DenseGrid(GridBase):
 
     def unsafe_set(self, location, value):
         self.content[self.index(location)] = value
-
-    def unsafe_row(self, row):
-        '''
-        Specialized implementation of the row iterator, based on list slicing
-        '''
-        start = self.index((row, 0))
-        return self.content[start:(start+self.num_columns)]
