@@ -30,11 +30,6 @@ class TestLocation(unittest.TestCase):
     def test_relative_distance(self):
         self.assertEqual(Loc(2, 2).relative(Dir.right, 10), Loc(2, 12))
 
-    def test_path(self):
-        start = Loc(3, 4)
-        end = start.path(Dir.down, Dir.left, Dir.down)
-        self.assertEqual(end, Loc(5, 3))
-
     def test_adjacent(self):
         adjacent = Loc(0, 0).adjacent()
 

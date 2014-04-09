@@ -54,6 +54,34 @@ class TestGenericConcreteGrid(TestGenericGrid):
                 else:
                     self.assertIs(cell, None)
 
+        for location, cell in self.grid.cells():
+            if location in locations:
+                self.assertEqual(cell, 10)
+            else:
+                self.assertIs(cell, None)
+
+    def test_single_row(self):
+        row = 3
+        for column in range(self.num_columns):
+            self.grid[row, column] = 10
+
+        for cell in self.grid.row(row):
+            self.assertEqual(cell, 10)
+
+    def test_single_column(self):
+        column = 1
+        for row in range(self.num_rows):
+            self.grid[row, column] = 10
+
+        for cell in self.grid.column(column):
+            self.assertEqual(cell, 10)
+
+    def test_row_bounds_check(self):
+        self.assertRaises(IndexError, self.grid.row, -1)
+
+    def test_column_bounds_check(self):
+        self.assertRaises(IndexError, self.grid.column, -1)
+
     def test_all_sets_row(self):
         for row in range(self.num_rows):
             for column in range(self.num_columns):
@@ -71,6 +99,13 @@ class TestGenericConcreteGrid(TestGenericGrid):
         for column in self.grid.columns():
             for r, cell in enumerate(column):
                 self.assertEqual(cell, r)
+
+    def test_locations(self):
+        locations = iter(self.grid.locations())
+
+        for row in range(self.num_rows):
+            for column in range(self.num_columns):
+                self.assertEqual((row, column), next(locations))
 
     def test_reset(self):
         locations = {

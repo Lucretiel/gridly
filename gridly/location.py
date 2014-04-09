@@ -1,5 +1,5 @@
 import collections
-from gridly.direction import Direction
+
 
 class Location(collections.namedtuple('Location', ('row', 'column'))):
     '''
@@ -56,7 +56,7 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         '''
         return Location(self[0], self[1]+distance)
 
-    def relative(self, direction, distance):
+    def relative(self, direction, distance=1):
         '''
         Return the location in a relative Direction and distance
         '''

@@ -147,7 +147,7 @@ class GridBase(metaclass=abc.ABCMeta):
         '''
         for row in self._row_range:
             for column in self._col_range:
-                yield (row, column)
+                yield Location(row, column)
 
     def cells(self):
         '''
