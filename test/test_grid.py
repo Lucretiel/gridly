@@ -134,6 +134,12 @@ class TestGenericConcreteGrid(TestGenericGrid):
 class TestDenseGrid(TestGenericConcreteGrid, TestCase):
     grid_type = DenseGrid
 
+    def test_func_init(self):
+        grid = DenseGrid(3, 4, func=lambda loc: loc[0] + loc[1])
+
+        for (r, c), cell in grid.cells():
+            self.assertEqual(cell, r + c)
+
 class TestSparseGrid(TestGenericConcreteGrid, TestCase):
     grid_type = SparseGrid
 
