@@ -13,7 +13,7 @@ class SparseGrid(GridBase):
         return self.content.get(location, self.fill)
 
     def unsafe_set(self, location, value):
-        if value is self.fill:
+        if value == self.fill:
             self.content.pop(location, None)
         else:
             self.content[location] = value
