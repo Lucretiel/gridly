@@ -11,6 +11,8 @@ class CompositeGrid(GridBase):
             self.grid = grid
             self.location = location
 
+        # We use unsafe get and set here, assuming that the parent CompositeGrid
+        # already did the check.
         def __getitem__(self, index):
             return self.grid.content[index].unsafe_get(self.location)
 
