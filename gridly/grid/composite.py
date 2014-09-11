@@ -6,21 +6,21 @@ class CompositeGrid(GridBase):
     ####################################################################
 
     class CellProxy:
-        __slots__ = ('grid', 'location')
+        __slots__ = ('content', 'location')
         def __init__(self, grid, location):
-            self.grid = grid
+            self.content = grid.content
             self.location = location
 
         # We use unsafe get and set here, assuming that the parent CompositeGrid
         # already did the check.
         def __getitem__(self, index):
-            return self.grid.content[index].unsafe_get(self.location)
+            return self.content[index].unsafe_get(self.location)
 
         def __setitem__(self, index, value):
-            self.grid.content[index].unsafe_set(self.location, value)
+            self.content[index].unsafe_set(self.location, value)
 
         def __len__(self):
-            return len(self.grid.content)
+            return len(self.content)
 
 
     def __init__(self, *grids):
