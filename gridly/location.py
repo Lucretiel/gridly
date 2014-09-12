@@ -7,6 +7,11 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
     a helper class over regular tuples of (row, column). It assumes that +row
     is down and +column is right.
     '''
+    def __new__(cls, row, column):
+        if not (isinstance(row, int) and isinstance(column, int)):
+            raise TypeError("Location must have int components", (row, column))
+        return super(Location, cls).__new__(row, column)
+
     @classmethod
     def zero(cls):
         '''
