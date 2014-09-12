@@ -3,4 +3,4 @@
 #Use a trap to preserve unittest's exit code
 trap "coverage report -m" EXIT
 
-coverage run --branch --source=gridly -m unittest test
+coverage run --source=gridly --branch -m unittest test
