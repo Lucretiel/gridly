@@ -10,7 +10,7 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
     def __new__(cls, row, column):
         if not (isinstance(row, int) and isinstance(column, int)):
             raise TypeError("Location must have int components", (row, column))
-        return super(Location, cls).__new__(row, column)
+        return super(Location, cls).__new__(cls, row, column)
 
     @classmethod
     def zero(cls):
