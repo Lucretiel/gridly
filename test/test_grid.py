@@ -2,6 +2,9 @@ from unittest import TestCase
 from gridly import DenseGrid, SparseGrid, CompositeGrid
 
 class TestGenericGrid:
+    '''
+    Test methods for all grid types.
+    '''
     num_rows = 5
     num_columns = 7
 
@@ -24,6 +27,10 @@ class TestGenericGrid:
             column = list(self.grid.column(self.num_columns-10))
 
 class TestGenericConcreteGrid(TestGenericGrid):
+    '''
+    Test methods for concrete grid types- ie, not CompositeGrid or
+    other grids based on other grids.
+    '''
     def setUp(self):
         self.grid = self.grid_type(
             self.num_rows,
