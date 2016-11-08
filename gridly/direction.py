@@ -1,7 +1,8 @@
 import enum
 from gridly.location import Location
 
-class Direction(enum.Enum):
+
+class Direction(Location, enum.Enum):
     '''Enum to reperesent each of the 4 directions'''
     up = north = Location(-1, 0)
     down = south = Location(1, 0)

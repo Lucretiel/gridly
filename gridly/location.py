@@ -41,31 +41,31 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         '''
         Return the location above this one, at the specified distance
         '''
-        return Location(self[0]-distance, self[1])
+        return Location(self[0] - distance, self[1])
 
     def below(self, distance=1):
         '''
         Return the location below this one, at the specified distance
         '''
-        return Location(self[0]+distance, self[1])
+        return Location(self[0] + distance, self[1])
 
     def left(self, distance=1):
         '''
         Return the location to the left of this one, at the specified distance
         '''
-        return Location(self[0], self[1]-distance)
+        return Location(self[0], self[1] - distance)
 
     def right(self, distance=1):
         '''
         Return the location to the right of this one, at the specified distance
         '''
-        return Location(self[0], self[1]+distance)
+        return Location(self[0], self[1] + distance)
 
     def relative(self, direction, distance=1):
         '''
         Return the location in a relative Direction and distance
         '''
-        return self + (direction.value * distance)
+        return self + (direction * distance)
 
     def adjacent(self):
         '''
@@ -84,3 +84,11 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
         Return a set of the 8 locations surrounding self
         '''
         return self.adjacent() | self.diagonals()
+
+    def relatives(self, directions):
+        '''
+        Given an iterable of directions (or locations), yield the locations
+        relative to this location
+        '''
+        for direction in directions:
+            yield self + direction
