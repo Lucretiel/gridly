@@ -200,7 +200,7 @@ class GridBase(metaclass=abc.ABCMeta):
         col_range = self._col_range
         for row in self._row_range:
             for column in col_range:
-                yield Location.unsafe_new(row, column)
+                yield Location(row, column)
 
     def cells(self, locations=None):
         '''
