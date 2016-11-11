@@ -1,12 +1,14 @@
 from gridly.grid.base import GridBase
 
+
 class SparseGrid(GridBase):
     '''
     SparseGrid is for grids for which most of the cells are some empty, default
     value. Implemented as a dict.
     '''
-    def __init__(self, num_rows, num_columns, fill=None):
-        GridBase.__init__(self, num_rows, num_columns, {})
+    def __init__(self, num_rows, num_columns, *, fill=None):
+        GridBase.__init__(self, num_rows, num_columns)
+        self.content = {}
         self.fill = fill
 
     def unsafe_get(self, location):

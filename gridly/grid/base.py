@@ -14,10 +14,9 @@ class GridBase(metaclass=abc.ABCMeta):
     iterates over all cells in a row) only bounds-checks the row once.
     '''
 
-    def __init__(self, num_rows, num_columns, content):
+    def __init__(self, num_rows, num_columns):
         self._row_range = range(num_rows)
         self._col_range = range(num_columns)
-        self.content = content
 
     @property
     def num_rows(self):
@@ -185,26 +184,23 @@ class GridBase(metaclass=abc.ABCMeta):
         Iterate over each row. Each row is an iterable, containing each cell in
         the row
         '''
-        unsafe_row = self.unsafe_row
-        for row in self._row_range:
-            yield unsafe_row(row)
+        return map(self.unsafe_row, self._row_range)
 
     def columns(self):
         '''
         Iterate over each columns. Each column is an iterable, containing each
         cell in the column
         '''
-        unsafe_column = self.unsafe_column
-        for column in self._col_range:
-            yield unsafe_column(column)
+        return map(self.unsafe_column, self._col_range)
 
     def locations(self):
         '''
         Iterate over each location on the grid in row-major order
         '''
+        col_range = self._col_range
         for row in self._row_range:
-            for column in self._col_range:
-                yield Location(row, column)
+            for column in col_range:
+                yield Location.unsafe_new(row, column)
 
     def cells(self, locations=None):
         '''

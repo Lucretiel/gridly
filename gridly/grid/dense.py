@@ -6,16 +6,18 @@ class DenseGrid(GridBase):
     DenseGrid is for grids which have content in most of the cells. It is
     implemented as a list.
     '''
-    def __init__(self, num_rows, num_columns, content=(), fill=None, func=None):
-        if func is not None:
-            content = [func((row, column))
-                for row in range(num_rows)
-                for column in range(num_columns)]
-        else:
-            content = list(islice(chain(content, repeat(fill)),
-                num_rows * num_columns))
+    def __init__(self, num_rows, num_columns, *, fill=None, content=None, func=None):
+        GridBase.__init__(self, num_rows, num_columns)
+        size = num_rows * num_columns
 
-        GridBase.__init__(self, num_rows, num_columns, content)
+        if func is not None:
+            self.content = list(map(func, self.locations()))
+        elif content is not None:
+            if len(content) != size:
+                raise ValueError("content must have length {}".format(size))
+            self.content = list(content)
+        else:
+            self.content = [None] * size
 
     def index(self, location):
         '''

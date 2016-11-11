@@ -6,12 +6,10 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
     Location reperesents a location in a 2D row-column space. It is primarily
     a helper class over regular tuples of (row, column). It assumes that +row
     is down and +column is right.
-    '''
-    def __new__(cls, row, column):
-        if not (isinstance(row, int) and isinstance(column, int)):
-            raise TypeError("Location must have int components", (row, column))
-        return super(Location, cls).__new__(cls, row, column)
 
+    Note that Location does *not* perform any type checking on its arguments;
+    all the type checking is performed by the validators of the Grid classes.
+    '''
     @classmethod
     def zero(cls):
         '''
