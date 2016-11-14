@@ -1,4 +1,5 @@
 import collections
+from functools import wraps
 
 
 class Location(collections.namedtuple('Location', ('row', 'column'))):
@@ -10,6 +11,7 @@ class Location(collections.namedtuple('Location', ('row', 'column'))):
     Note that Location does *not* perform any type checking on its arguments;
     all the type checking is performed by the validators of the Grid classes.
     '''
+
     @classmethod
     def zero(cls):
         '''

@@ -1,5 +1,5 @@
-from itertools import repeat, chain, islice
 from gridly.grid.base import GridBase
+
 
 class DenseGrid(GridBase):
     '''
@@ -19,14 +19,14 @@ class DenseGrid(GridBase):
         else:
             self.content = [None] * size
 
-    def index(self, location):
+    def _index(self, location):
         '''
         Convert a (row, column) tuple to an index. Performs no bounds checking.
         '''
         return (self.num_columns * location[0]) + location[1]
 
     def unsafe_get(self, location):
-        return self.content[self.index(location)]
+        return self.content[self._index(location)]
 
     def unsafe_set(self, location, value):
-        self.content[self.index(location)] = value
+        self.content[self._index(location)] = value
