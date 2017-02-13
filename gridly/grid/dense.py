@@ -17,7 +17,7 @@ class DenseGrid(GridBase):
                 raise ValueError("content must have length {}".format(size))
             self.content = list(content)
         else:
-            self.content = [None] * size
+            self.content = [fill] * size
 
     def _index(self, location):
         '''
