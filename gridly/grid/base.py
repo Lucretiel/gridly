@@ -1,5 +1,143 @@
 import abc
+
 from gridly import Location
+
+
+# Can't subclass range :(
+class Dimension:
+    def __init__(self, size):
+        self.range = range(0, size, 1)
+
+    def __len__(self):
+        return len(self.range)
+
+    # TODO: getitem? It's literally just the identity function with bounds
+    # checking
+
+    def __iter__(self):
+        return iter(self.range)
+
+    def valid(self, index):
+        if not isinstance(index, int):
+            raise TypeError(index)
+
+        return index in self.range
+
+    def check(self, index):
+        if self.valid(index):
+            return index
+        else:
+            raise IndexError(index)
+
+
+# All the proxy types assume that validation was already completed on the slice
+# they represent
+class Proxy:
+    def __init__(self, grid, alternate_dim, completer):
+        self._unsafe_get = grid.unsafe_get
+        self._unsafe_set = grid.unsafe_set
+        self._unsafe_complete = completer
+        self._alternate_dim = alternate_dim
+        self._check = alternate_dim.check
+
+    def _complete_location(self, index):
+        return self._unsafe_complete(self._check(index))
+
+    def unsafe_get(self, index):
+        return self._unsafe_get(self._unsafe_complete(index))
+
+    def unsafe_get_with_loc(self, index):
+        '''
+        Return the (location, cell) pair associated with the index
+        '''
+        loc = self._unsafe_complete(index)
+        return loc, self._unsafe_get(loc)
+
+    def unsafe_set(self, index, value):
+        return self._unsafe_set(self._unsafe_complete(index), value)
+
+    def __getitem__(self, index):
+        return self.unsafe_get(self._check(index))
+
+    def get_with_location(self, index):
+        return self.unsafe_get_with_loc(self._check(index))
+
+    def __setitem__(self, index, valus):
+        return self.unsafe_set(self._check(index), value)
+
+    def __len__(self):
+        return len(self._alternate_dim)
+
+    def __iter__(self):
+        get = self.unsafe_get
+
+        for index in self._alternate_dim:
+            yield get(index)
+
+    def with_locations(self):
+        get = self.unsafe_get_with_loc
+
+        for index in self._alternate_dim:
+            yield get(index)
+
+
+class RowProxy(Proxy):
+    def __init__(self, row, grid):
+        Proxy.__init__(
+            self,
+            grid=grid,
+            alternate_dim=grid._col_dim,
+            completer=lambda column: Location(row, column)
+        )
+
+
+class ColumnProxy(Proxy):
+    def __init__(self, column, grid):
+        Proxy.__init__(
+            self,
+            grid=grid,
+            alternate_dim=grid._row_dim,
+            completer=lambda row: Location(row, column)
+        )
+
+
+class MultiProxy:
+    def __init__(self, grid, dimension, ProxyType):
+        self._unsafe_proxy = lambda index: ProxyType(index, grid)
+        self._dimension = dimension
+        self._check = dimension.check
+
+    def __len__(self):
+        return len(self._index_range)
+
+    def __getitem__(self, index):
+        return self._unsafe_proxy(self._check(index))
+
+    def __iter__(self):
+        make_proxy = self._unsafe_proxy
+
+        for index in self._index_range:
+            yield make_proxy(index)
+
+
+class RowsProxy(MultiProxy):
+    def __init__(self, grid):
+        MultiProxy.__init__(
+            self,
+            grid=grid,
+            dimension=grid._row_dim,
+            ProxyType=RowProxy
+        )
+
+
+class ColumnsProxy(MultiProxy):
+    def __init__(self, grid):
+        MultiProxy.__init__(
+            self,
+            grid=grid,
+            dimension=grid._col_dim,
+            ProxyType=ColumnProxy
+        )
 
 
 class GridBase(metaclass=abc.ABCMeta):
@@ -15,51 +153,26 @@ class GridBase(metaclass=abc.ABCMeta):
     '''
 
     def __init__(self, num_rows, num_columns):
-        self._row_range = range(num_rows)
-        self._col_range = range(num_columns)
+        self._row_dim = Dimension(num_rows)
+        self._col_dim = Dimension(num_columns)
 
-    @property
-    def num_rows(self):
-        return len(self._row_range)
+        self.dimensions = self.num_rows, self.num_columns = num_rows, num_columns
 
-    @property
-    def num_columns(self):
-        return len(self._col_range)
+        self.valid_row = self._row_dim.valid
+        self.valid_column = self._col_dim.valid
 
-    @property
-    def dimensions(self):
-        return self.num_rows, self.num_columns
+        self.check_row = self._row_dim.check
+        self.check_column = self._col_dim.check
 
     ####################################################################
     # Bounds Checkers
     ####################################################################
 
-    # TODO: these are inner-loop functions. Determine if they should be optimized.
-    def valid_row(self, row):
-        '''
-        return true if the row is in the bounds of this grid. Raise a TypeError
-        if row is not an int.
-        '''
-        if not isinstance(row, int):
-            raise TypeError(row)
-
-        return row in self._row_range
-
-    def valid_column(self, column):
-        '''
-        return true if the column is in the bounds of this grid. Raise a TypeError
-        if column is not an int.
-        '''
-        if not isinstance(column, int):
-            raise TypeError(column)
-
-        return column in self._col_range
-
-    def valid(self, location):
+    def valid_location(self, location):
         '''
         Return true if a location is in the bounds of this grid. Raise a TypeError
         if location is not a valid location type, which is loosely defined as a
-        container of two ints.
+        subscriptable container of two ints.
         '''
         if len(location) != 2:
             raise TypeError(location)
@@ -69,35 +182,22 @@ class GridBase(metaclass=abc.ABCMeta):
         except TypeError as e:
             raise TypeError(location) from e
 
-    def check_row(self, row):
-        '''
-        Return the row if it is in the bounds. Raise IndexError otherwise. May
-        also raise a TypeError if row is an invalid type.
-        '''
-        if self.valid_row(row):
-            return row
-        else:
-            raise IndexError(row)
-
-    def check_column(self, column):
-        '''
-        Return the row if it is in the bounds. Raise IndexError otherwise. May
-        also raise a TypeError if location is an invalid type.
-        '''
-        if self.valid_column(column):
-            return column
-        else:
-            raise IndexError(column)
-
     def check_location(self, location):
         '''
         Return the location if it is valid. Raise IndexError otherwise. May
         also raise a TypeError if location is an invalid type.
         '''
-        if self.valid(location):
+        if len(location) != 2:
+            raise TypeError(location)
+
+        try:
+            self.check_row(location[0])
+            self.check_column(location[1])
             return location
-        else:
-            raise IndexError(location)
+        except IndexError as e:
+            raise IndexError(location) from e
+        except TypeError as e:
+            raise TypeError(location) from e
 
     ####################################################################
     # Basic element access
@@ -144,23 +244,19 @@ class GridBase(metaclass=abc.ABCMeta):
 
     def unsafe_row(self, row):
         '''
-        Iterate over all the cells in a row. Performs no range checking.
+        Return an iterable RowProxy to the given row.
         '''
-        unsafe_get = self.unsafe_get
-        for column in self._col_range:
-            yield unsafe_get((row, column))
+        return RowProxy(row, self)
 
     def unsafe_column(self, column):
         '''
-        Iterate over all the cells in a column. Performs no range checking.
+        Return an iterable ColumnProxy to the given column.
         '''
-        unsafe_get = self.unsafe_get
-        for row in self._row_range:
-            yield unsafe_get((row, column))
+        return ColumnProxy(column, self)
 
     def unsafe_cells(self, locations):
         '''
-        Given an iterable of locations, iterate over (cell, location) pairs.
+        Given an iterable of locations, yield all (location, cell) pairs.
         Performs no bounds checking on the location.
         '''
         unsafe_get = self.unsafe_get
@@ -169,13 +265,13 @@ class GridBase(metaclass=abc.ABCMeta):
 
     def row(self, row):
         '''
-        Iterate over all the cells in a row. Raises IndexError if row is out of range
+        Return an iterable proxy for all the rows in the grid
         '''
-        return self.unsafe_row(self.check_row(row))
+        return RowsProxy(self)
 
     def column(self, column):
         '''
-        Iterate over all the cells in a column
+        Return an iterable proxy for all the rows in the grid
         '''
         return self.unsafe_column(self.check_column(column))
 
